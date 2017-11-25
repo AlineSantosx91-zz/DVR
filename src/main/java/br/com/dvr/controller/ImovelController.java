@@ -1,7 +1,6 @@
 package br.com.dvr.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.dvr.model.Imovel;
 import br.com.dvr.service.ImovelService;
@@ -39,15 +37,8 @@ public class ImovelController {
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
-	public ResponseEntity<Void> cadastrarImovel(@RequestBody Imovel imovelP,
-			UriComponentsBuilder uriComponentsBuilder) {
-
-		final Result<Imovel> imovel = imovelService.addImovel(imovelP);
-		final HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.setLocation(
-				uriComponentsBuilder.path("/imoveis/{id}").buildAndExpand(imovel.getResult().getId()).toUri());
-
-		return new ResponseEntity<Void>(httpHeaders, HttpStatus.CREATED);
+	public ResponseEntity<Result<Imovel>> cadastrarImovel(@RequestBody Imovel imovel) {
+		return imovelService.addImovel(imovel);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
