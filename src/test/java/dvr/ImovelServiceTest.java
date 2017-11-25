@@ -2,11 +2,13 @@ package dvr;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.math.BigInteger;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -29,14 +31,19 @@ public class ImovelServiceTest {
 	@Mock
 	private ImovelRepository imovelRepository;
 	
+	@Before
+	public void setup(){
+		Imovel imovelResponse = mock(Imovel.class);
+		when(imovelRepository.save(any(Imovel.class))).thenReturn(imovelResponse);
+
+	}
+	
 	@Test
 	public void deveTestarCadastroDeImovelComSucesso(){
 		Imovel imovelRequest = gerarImovelPopulado(222, 444, 3, 4, 210);
-		Imovel imovelResponse = mock(Imovel.class);
-		
-		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
 		
 		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		
 		assertNotNull(response);
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
 		assertEquals(1, response.getBody().getStatus());
@@ -46,11 +53,9 @@ public class ImovelServiceTest {
 	@Test
 	public void deveTestarCadastroDeImovelComErroCamposNulos(){
 		Imovel imovelRequest = gerarImovelPopulado(null, null, 3, 4, 210);
-		Imovel imovelResponse = mock(Imovel.class);
-		
-		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
-		
+				
 		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(0, response.getBody().getStatus());
@@ -60,11 +65,9 @@ public class ImovelServiceTest {
 	@Test
 	public void deveTestarCadastroDeImovelComErroCampoXInvalido(){
 		Imovel imovelRequest = gerarImovelPopulado(1600, 444, 3, 4, 210);
-		Imovel imovelResponse = mock(Imovel.class);
-		
-		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
 		
 		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(0, response.getBody().getStatus());
@@ -74,11 +77,9 @@ public class ImovelServiceTest {
 	@Test
 	public void deveTestarCadastroDeImovelComErroCampoYInvalido(){
 		Imovel imovelRequest = gerarImovelPopulado(222, 1001, 3, 4, 210);
-		Imovel imovelResponse = mock(Imovel.class);
-		
-		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
 		
 		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(0, response.getBody().getStatus());
@@ -88,11 +89,9 @@ public class ImovelServiceTest {
 	@Test
 	public void deveTestarCadastroDeImovelComErroCampoBedsInvalido(){
 		Imovel imovelRequest = gerarImovelPopulado(222, 444, 3, 0, 210);
-		Imovel imovelResponse = mock(Imovel.class);
-		
-		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
 		
 		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(0, response.getBody().getStatus());
@@ -102,11 +101,9 @@ public class ImovelServiceTest {
 	@Test
 	public void deveTestarCadastroDeImovelComErroCampoBathsInvalido(){
 		Imovel imovelRequest = gerarImovelPopulado(222, 444, 5, 3, 210);
-		Imovel imovelResponse = mock(Imovel.class);
-		
-		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
 		
 		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(0, response.getBody().getStatus());
@@ -116,11 +113,9 @@ public class ImovelServiceTest {
 	@Test
 	public void deveTestarCadastroDeImovelComErroCampoSquareMetersInvalido(){
 		Imovel imovelRequest = gerarImovelPopulado(222, 444, 2, 3, 10);
-		Imovel imovelResponse = mock(Imovel.class);
-		
-		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
 		
 		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(0, response.getBody().getStatus());
@@ -130,11 +125,9 @@ public class ImovelServiceTest {
 	@Test
 	public void deveTestarCadastroDeImovelComErroEmDoisCampos(){
 		Imovel imovelRequest = gerarImovelPopulado(222, 444, 0, 3, 10);
-		Imovel imovelResponse = mock(Imovel.class);
-		
-		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
 		
 		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(0, response.getBody().getStatus());
