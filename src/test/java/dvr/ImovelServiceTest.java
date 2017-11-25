@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import br.com.dvr.model.Imovel;
@@ -37,9 +38,107 @@ public class ImovelServiceTest {
 		
 		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
 		assertNotNull(response);
+		assertEquals(HttpStatus.CREATED, response.getStatusCode());
 		assertEquals(1, response.getBody().getStatus());
 		assertEquals(null, response.getBody().getValidators());
+	}
+	
+	@Test
+	public void deveTestarCadastroDeImovelComErroCamposNulos(){
+		Imovel imovelRequest = gerarImovelPopulado(null, null, 3, 4, 210);
+		Imovel imovelResponse = mock(Imovel.class);
 		
+		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
+		
+		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(0, response.getBody().getStatus());
+		assertEquals("Campos de delimitaçao devem ser preenchidos", response.getBody().getValidators().get(0).getMessage());
+	}
+	
+	@Test
+	public void deveTestarCadastroDeImovelComErroCampoXInvalido(){
+		Imovel imovelRequest = gerarImovelPopulado(1600, 444, 3, 4, 210);
+		Imovel imovelResponse = mock(Imovel.class);
+		
+		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
+		
+		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(0, response.getBody().getStatus());
+		assertEquals("Valor do campo X inválido", response.getBody().getValidators().get(0).getMessage());
+	}
+	
+	@Test
+	public void deveTestarCadastroDeImovelComErroCampoYInvalido(){
+		Imovel imovelRequest = gerarImovelPopulado(222, 1001, 3, 4, 210);
+		Imovel imovelResponse = mock(Imovel.class);
+		
+		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
+		
+		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(0, response.getBody().getStatus());
+		assertEquals("Valor do campo Y inválido", response.getBody().getValidators().get(0).getMessage());
+	}
+	
+	@Test
+	public void deveTestarCadastroDeImovelComErroCampoBedsInvalido(){
+		Imovel imovelRequest = gerarImovelPopulado(222, 444, 3, 0, 210);
+		Imovel imovelResponse = mock(Imovel.class);
+		
+		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
+		
+		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(0, response.getBody().getStatus());
+		assertEquals("Quantidade de quarto deve ser no mínimo 1 e no máximo 5", response.getBody().getValidators().get(0).getMessage());
+	}
+	
+	@Test
+	public void deveTestarCadastroDeImovelComErroCampoBathsInvalido(){
+		Imovel imovelRequest = gerarImovelPopulado(222, 444, 5, 3, 210);
+		Imovel imovelResponse = mock(Imovel.class);
+		
+		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
+		
+		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(0, response.getBody().getStatus());
+		assertEquals("Quantidade de quarto deve ser no mínimo 1 e no máximo 4", response.getBody().getValidators().get(0).getMessage());
+	}
+	
+	@Test
+	public void deveTestarCadastroDeImovelComErroCampoSquareMetersInvalido(){
+		Imovel imovelRequest = gerarImovelPopulado(222, 444, 2, 3, 10);
+		Imovel imovelResponse = mock(Imovel.class);
+		
+		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
+		
+		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(0, response.getBody().getStatus());
+		assertEquals("Metragem inválida, máximo 240 metros quadrados, e no mínimo 20", response.getBody().getValidators().get(0).getMessage());
+	}
+	
+	@Test
+	public void deveTestarCadastroDeImovelComErroEmDoisCampos(){
+		Imovel imovelRequest = gerarImovelPopulado(222, 444, 0, 3, 10);
+		Imovel imovelResponse = mock(Imovel.class);
+		
+		when(imovelRepository.save(imovelRequest)).thenReturn(imovelResponse);
+		
+		ResponseEntity<Result<Imovel>> response = imovelService.addImovel(imovelRequest);
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(0, response.getBody().getStatus());
+		assertEquals(2, response.getBody().getValidators().size());
 	}
 	
 	private Imovel gerarImovelPopulado(Integer x, Integer y, Integer baths, Integer beds, Integer meters){
@@ -55,9 +154,4 @@ public class ImovelServiceTest {
 		return imovel;
 	}
 
-//			A área total de Spotippos é definida da seguinte forma 0 <= x <= 1400 e 0 <= y <= 1000, e a delimitação de suas províncias são encontradas neste json.
-//			Um imóvel em Spotippos tem as seguintes características:
-//			No máximo 5 quartos (beds), e no mínimo 1
-//			No máximo 4 banheiros (baths), e no mínimo 1
-//			No máximo 240 metros quadrados, e no mínimo 20
 }
